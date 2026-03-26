@@ -2,6 +2,7 @@ import Order from "../models/Order.js";
 import Product from "../models/Products.js";
 import User from "../models/User.js";
 import sendEmail from "../utils/sendEmail.js";
+import { sendAdminOrderNotification } from "../utils/resendEmail.js";
 
 // @desc    Create new order
 // @route   POST /orders
@@ -45,7 +46,7 @@ export const addOrderItems = async (req, res) => {
       }
     }
 
-    // Send order confirmation email
+    // Send order confirmation email to user
     const user = await User.findById(req.user._id);
     if (user && user.email) {
       await sendEmail({
@@ -53,6 +54,9 @@ export const addOrderItems = async (req, res) => {
         subject: `Order Confirmation - Zero Degree`,
         message: `Thank you for your order, ${user.name}!\n\nYour order ID is ${createdOrder._id}.\nTotal Amount: ₹${totalPrice}\n\nWe will notify you once your items are shipped.`,
       });
+
+      // Send notification to Admin using Resend
+      await sendAdminOrderNotification(createdOrder, user);
     }
 
     res.status(201).json(createdOrder);
