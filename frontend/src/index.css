@@ -1,0 +1,49 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    background-color: #f8fafc; /* Light Mode Default: neutral-50 */
+    color: #050505;          /* Light Mode Default: black */
+    transition: background-color 0.5s ease-in-out, color 0.5s ease-in-out;
+  }
+
+  .dark body {
+    background-color: #050505; /* Dark Mode: black */
+    color: #ffffff;          /* Dark Mode: white */
+  }
+
+  /* Custom Luxury Scrollbar - Light Mode Default */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #f8fafc; 
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #cbd5e1; 
+    border-radius: 8px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8; 
+  }
+
+  /* Custom Luxury Scrollbar - Dark Mode */
+  .dark ::-webkit-scrollbar-track {
+    background: #050505; 
+  }
+  .dark ::-webkit-scrollbar-thumb {
+    background: #2a2a2a; 
+  }
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: #4a4a4a; 
+  }
+}
