@@ -2,10 +2,25 @@ import { Link } from "react-router-dom";
 import ProductCard from "../components/ProductCard";
 import { useEffect, useState, useRef } from "react";
 import { fetchProducts } from "../service/api";
+import axios from "axios";
 
 const Home = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
+
+    // 0. WAKE UP BACKEND (Render free tier sleep fix)
+    useEffect(() => {
+        const wakeup = async () => {
+            try {
+                const apiURL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000';
+                await axios.get(apiURL);
+                console.log("Backend wake-up signal sent successfully.");
+            } catch (error) {
+                console.log("Backend wake-up attempt (non-blocking).");
+            }
+        };
+        wakeup();
+    }, []);
     
     // 1. Refs for Performance (Bypassing React re-renders for scroll)
     const heroBgRef = useRef(null);

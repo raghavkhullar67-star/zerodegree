@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // 1. Base API setup (Base URL ko yahan set karein)
-const API = axios.create({ baseURL: import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000' });
+const API = axios.create({ baseURL: import.meta.env.VITE_API_URL || 'https://zerodegree-ixie.onrender.com' });
 
 // 2. Interceptor: Har request se pehle ye check karega ki token hai ya nahi
 API.interceptors.request.use((req) => {

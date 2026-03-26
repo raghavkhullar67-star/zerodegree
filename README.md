@@ -2,6 +2,11 @@
 
 Zero Degree is a modern, responsive, and feature-rich e-commerce application built with the MERN stack (MongoDB, Express, React, Node.js). It offers a seamless shopping experience with secure authentication, cart management, and payment integration.
 
+## 🔴 Live Links
+- **Netlify (Frontend):** [https://newzerodegree.netlify.app/](https://newzerodegree.netlify.app/)
+- **Render (Backend):** [https://zerodegree-ixie.onrender.com](https://zerodegree-ixie.onrender.com)
+
+
 ## 🚀 Features
 
 ### Frontend
