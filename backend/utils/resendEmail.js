@@ -79,7 +79,7 @@ export const sendAdminOrderNotification = async (order, user) => {
               </div>
             </div>
 
-            <a href="https://newzerodegree.netlify.app/admin/orders/${order._id}" style="display: block; width: 100%; text-align: center; background: #3182ce; color: white; padding: 14px 0; border-radius: 8px; text-decoration: none; font-weight: 700; margin-top: 30px; box-sizing: border-box;">View Order in Dashboard</a>
+            <a href="https://newzerodegree.netlify.app/admin/orders" style="display: block; width: 100%; text-align: center; background: #3182ce; color: white; padding: 14px 0; border-radius: 8px; text-decoration: none; font-weight: 700; margin-top: 30px; box-sizing: border-box;">View Order in Dashboard</a>
           </div>
           
           <div class="footer">
