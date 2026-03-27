@@ -20,7 +20,7 @@ const Orders = () => {
   const orders = allOrders.slice(); // Not needed to filter anymore since backend only returns for this user
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] dark:bg-[#050505] text-black dark:text-white font-sans selection:bg-black selection:text-white dark:selection:bg-white dark:selection:text-black pb-32 pt-10 transition-colors duration-500">
+    <div className="min-h-screen bg-[#f8fafc] dark:bg-[#050505] text-black dark:text-white font-sans selection:bg-black selection:text-white dark:selection:bg-white dark:selection:text-black pb-32 pt-28 md:pt-32 transition-colors duration-500">
 
       {/* LUXURY ANIMATIONS */}
       <style>

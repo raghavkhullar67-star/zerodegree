@@ -48,7 +48,7 @@ const Register = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#f8fafc] dark:bg-[#050505] text-black dark:text-white font-sans selection:bg-black selection:text-white dark:selection:bg-white dark:selection:text-black flex flex-col md:flex-row transition-colors duration-500">
+        <div className="min-h-screen bg-[#f8fafc] dark:bg-[#050505] text-black dark:text-white font-sans selection:bg-black selection:text-white dark:selection:bg-white dark:selection:text-black flex flex-col md:flex-row transition-colors duration-500 pt-24">
             
             {/* LEFT SIDE - Minimalist Registration Form */}
             <div className="w-full md:w-1/2 flex items-center justify-center p-8 md:p-12 lg:p-24 order-2 md:order-1 transition-colors duration-500">

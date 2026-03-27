@@ -65,7 +65,7 @@ const Cart = () => {
         `}
       </style>
 
-      <div className="container mx-auto px-4 lg:px-12 py-12 md:py-20">
+      <div className="container mx-auto px-4 lg:px-12 pt-28 pb-12 md:pt-32 md:pb-20">
 
         <div className="flex justify-between items-end border-b border-black/10 dark:border-white/10 pb-6 mb-12 animate-fade-up transition-colors duration-500">
           <h1 className="text-3xl md:text-4xl font-light uppercase tracking-[0.2em] text-black dark:text-white transition-colors duration-500">

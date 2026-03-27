@@ -83,7 +83,7 @@ const ProductDetails = () => {
   if (!product) return <div className="min-h-screen bg-[#f8fafc] dark:bg-black flex items-center justify-center text-black dark:text-white transition-colors duration-500">Piece Not Found</div>;
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] dark:bg-[#050505] text-black dark:text-white transition-colors duration-500 font-sans selection:bg-black selection:text-white dark:selection:bg-white dark:selection:text-black pb-20">
+    <div className="min-h-screen bg-[#f8fafc] dark:bg-[#050505] text-black dark:text-white transition-colors duration-500 font-sans selection:bg-black selection:text-white dark:selection:bg-white dark:selection:text-black pb-20 pt-20">
       
       {/* Breadcrumb */}
       <div className="container mx-auto px-6 py-8 text-xs uppercase tracking-widest text-gray-500 dark:text-gray-400">

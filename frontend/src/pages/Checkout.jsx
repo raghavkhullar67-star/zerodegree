@@ -173,7 +173,7 @@ const Checkout = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] dark:bg-[#050505] text-black dark:text-white font-sans pb-20 pt-10 transition-colors duration-500">
+    <div className="min-h-screen bg-[#f8fafc] dark:bg-[#050505] text-black dark:text-white font-sans pb-20 pt-28 md:pt-32 transition-colors duration-500">
       
       <div className="container mx-auto px-4 lg:px-12 max-w-7xl">
         <h1 className="text-3xl md:text-5xl font-light uppercase tracking-[0.2em] mb-12 border-b border-black/10 dark:border-white/10 pb-8 transition-colors duration-500">Secure Checkout</h1>

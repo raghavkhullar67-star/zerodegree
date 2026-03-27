@@ -97,7 +97,7 @@ const Products = () => {
       </style>
 
       {/* 1. CINEMATIC HERO SECTION */}
-      <div className="relative w-full h-[40vh] lg:h-[50vh] flex flex-col items-center justify-center overflow-hidden border-b border-black/5 dark:border-white/5 transition-colors duration-500">
+      <div className="relative w-full h-[40vh] lg:h-[50vh] flex flex-col items-center justify-center overflow-hidden border-b border-black/5 dark:border-white/5 transition-colors duration-500 pt-20">
         <div className="absolute inset-0 bg-slate-100 dark:bg-[#080808]">
            {/* Subtle Moving Gradient for Depth */}
            <div className="absolute inset-0 opacity-10 dark:opacity-20 bg-[radial-gradient(circle_at_50%_50%,_#333_0%,_transparent_100%)] dark:bg-[radial-gradient(circle_at_50%_50%,_#111_0%,_transparent_100%)]"></div>
