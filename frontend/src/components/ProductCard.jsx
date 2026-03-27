@@ -61,6 +61,7 @@ const ProductCard = ({ product }) => {
           <img
             src={product.image}
             alt={product.title}
+            loading="lazy"
             className="w-full h-full object-cover object-center transition-all duration-[1.5s] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-110"
           />
           {/* Cinematic Overlay */}
