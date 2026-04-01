@@ -2,7 +2,7 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../features/cart/cartSlice";
 import { useState, useEffect } from "react";
-import { fetchProductById, createProductReview } from "../service/api"; 
+import { fetchProductById, createProductReview } from "../service/api";
 import { FaTimes, FaStar } from "react-icons/fa"; // Cross and Star icons
 import toast from "react-hot-toast";
 
@@ -17,7 +17,7 @@ const ProductDetails = () => {
   const [selectedSize, setSelectedSize] = useState("M");
   const [isAdded, setIsAdded] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false); // Modal state
-  
+
   // Review States
   const { user } = useSelector((state) => state.auth);
   const [rating, setRating] = useState(5);
@@ -44,7 +44,7 @@ const ProductDetails = () => {
     if (isAdded) {
       navigate("/cart");
     } else {
-      dispatch(addToCart({ 
+      dispatch(addToCart({
         _id: product._id,
         title: product.title,
         price: product.price,
@@ -84,26 +84,26 @@ const ProductDetails = () => {
 
   return (
     <div className="min-h-screen bg-[#f8fafc] dark:bg-[#050505] text-black dark:text-white transition-colors duration-500 font-sans selection:bg-black selection:text-white dark:selection:bg-white dark:selection:text-black pb-20 pt-20">
-      
+
       {/* Breadcrumb */}
       <div className="container mx-auto px-6 py-8 text-xs uppercase tracking-widest text-gray-500 dark:text-gray-400">
-        <Link to="/" className="hover:text-black dark:hover:text-white transition-colors">Zero Degree</Link> 
-        <span className="mx-3">/</span> 
+        <Link to="/" className="hover:text-black dark:hover:text-white transition-colors">Zero Degree</Link>
+        <span className="mx-3">/</span>
         <Link to="/products" className="hover:text-black dark:hover:text-white transition-colors">Archive</Link>
-        <span className="mx-3">/</span> 
+        <span className="mx-3">/</span>
         <span className="text-gray-800 dark:text-gray-300">{product.title}</span>
       </div>
 
       <div className="container mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-start">
-        
+
         {/* Left: Product Image (Fixed Height & Clickable) */}
-        <div 
+        <div
           className="w-full bg-white dark:bg-[#0a0a0a] transition-colors duration-500 lg:h-[80vh] aspect-[3/4] flex items-center justify-center overflow-hidden border border-black/5 dark:border-white/5 cursor-zoom-in"
           onClick={() => setIsModalOpen(true)}
         >
-          <img 
-            src={product.image} 
-            alt={product.title} 
+          <img
+            src={product.image}
+            alt={product.title}
             className="max-w-full max-h-full object-contain hover:scale-105 transition-transform duration-1000"
           />
         </div>
@@ -113,19 +113,19 @@ const ProductDetails = () => {
           <span className="text-xs uppercase tracking-[0.4em] text-gray-500 dark:text-gray-400 mb-4 transition-colors duration-500">
             {product.category || "Collection"}
           </span>
-          
+
           <h1 className="text-3xl md:text-5xl font-light uppercase tracking-widest mb-6 leading-tight">
             {product.title}
           </h1>
-          
+
           <div className="flex items-center gap-6 mb-8">
             <p className="text-xl font-medium tracking-widest text-gray-800 dark:text-gray-200 transition-colors duration-500">
               ₹{product.price}
             </p>
             {product.stock > 0 ? (
-                <span className="text-xs px-2 py-1 border border-emerald-500/30 text-emerald-500 uppercase tracking-tighter">In Stock</span>
+              <span className="text-xs px-2 py-1 border border-emerald-500/30 text-emerald-500 uppercase tracking-tighter">In Stock</span>
             ) : (
-                <span className="text-xs px-2 py-1 border border-red-500/30 text-red-500 uppercase tracking-tighter">Sold Out</span>
+              <span className="text-xs px-2 py-1 border border-red-500/30 text-red-500 uppercase tracking-tighter">Sold Out</span>
             )}
           </div>
 
@@ -152,11 +152,10 @@ const ProductDetails = () => {
                     setSelectedSize(size);
                     setIsAdded(false);
                   }}
-                  className={`py-3 text-xs tracking-widest transition-all duration-300 border ${
-                    selectedSize === size 
-                    ? "border-black dark:border-white bg-black dark:bg-white text-white dark:text-black" 
-                    : "border-black/10 dark:border-white/10 text-gray-500 dark:text-gray-400 hover:border-black/40 dark:hover:border-white/40"
-                  }`}
+                  className={`py-3 text-xs tracking-widest transition-all duration-300 border ${selectedSize === size
+                      ? "border-black dark:border-white bg-black dark:bg-white text-white dark:text-black"
+                      : "border-black/10 dark:border-white/10 text-gray-500 dark:text-gray-400 hover:border-black/40 dark:hover:border-white/40"
+                    }`}
                 >
                   {size}
                 </button>
@@ -168,13 +167,12 @@ const ProductDetails = () => {
           <button
             disabled={product.stock <= 0}
             onClick={handleAddToCart}
-            className={`w-full py-5 text-xs uppercase tracking-[0.3em] transition-all duration-500 ${
-              isAdded 
-              ? "bg-transparent border border-emerald-500 text-emerald-500" 
-              : product.stock > 0 
-                ? "bg-black dark:bg-white text-white dark:text-black hover:bg-black/80 dark:hover:bg-gray-200" 
-                : "bg-gray-200 dark:bg-gray-800 text-gray-500 dark:text-gray-400 cursor-not-allowed"
-            }`}
+            className={`w-full py-5 text-xs uppercase tracking-[0.3em] transition-all duration-500 ${isAdded
+                ? "bg-transparent border border-emerald-500 text-emerald-500"
+                : product.stock > 0
+                  ? "bg-black dark:bg-white text-white dark:text-black hover:bg-black/80 dark:hover:bg-gray-200"
+                  : "bg-gray-200 dark:bg-gray-800 text-gray-500 dark:text-gray-400 cursor-not-allowed"
+              }`}
           >
             {product.stock <= 0 ? "Out of Stock" : isAdded ? "Added to Bag — View" : "Add to Bag"}
           </button>
@@ -182,12 +180,12 @@ const ProductDetails = () => {
           {/* Details List */}
           <div className="mt-12 space-y-4 border-t border-black/5 dark:border-white/5 pt-8 transition-colors duration-500">
             <div className="flex justify-between text-xs uppercase tracking-widest py-2">
-                <span className="text-gray-500 dark:text-gray-400">Shipping</span>
-                <span>Free Worldwide</span>
+              <span className="text-gray-500 dark:text-gray-400">Shipping</span>
+              <span>Free Worldwide</span>
             </div>
             <div className="flex justify-between text-xs uppercase tracking-widest py-2">
-                <span className="text-gray-500 dark:text-gray-400">Material</span>
-                <span>100% Premium Cotton</span>
+              <span className="text-gray-500 dark:text-gray-400">Material</span>
+              <span>100% Premium Cotton</span>
             </div>
           </div>
         </div>
@@ -196,12 +194,12 @@ const ProductDetails = () => {
       {/* --- CUSTOMER REVIEWS SECTION --- */}
       <div className="container mx-auto px-6 py-20 mt-10 border-t border-black/10 dark:border-white/10 transition-colors duration-500">
         <h2 className="text-2xl font-light uppercase tracking-widest text-black dark:text-white mb-8 transition-colors duration-500">Client Reviews</h2>
-        
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
           {/* Reviews List */}
           <div>
             {product.reviews && product.reviews.length === 0 && (
-               <div className="text-gray-500 dark:text-gray-400 text-sm italic tracking-wide transition-colors duration-500">No reviews yet. Be the first to review this piece.</div>
+              <div className="text-gray-500 dark:text-gray-400 text-sm italic tracking-wide transition-colors duration-500">No reviews yet. Be the first to review this piece.</div>
             )}
             <div className="space-y-8">
               {product.reviews?.map((review) => (
@@ -225,8 +223,8 @@ const ProductDetails = () => {
               <form onSubmit={submitReviewHandler} className="space-y-6 bg-white dark:bg-[#0a0a0a] p-8 border border-black/5 dark:border-white/5 transition-colors duration-500">
                 <div>
                   <label className="block text-xs uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2 transition-colors duration-500">Rating</label>
-                  <select 
-                    value={rating} 
+                  <select
+                    value={rating}
                     onChange={(e) => setRating(e.target.value)}
                     className="w-full bg-white dark:bg-black border border-black/10 dark:border-white/10 p-3 text-sm text-black dark:text-white focus:outline-none focus:border-black/40 dark:focus:border-white/40 mb-4 transition-colors duration-500"
                   >
@@ -239,7 +237,7 @@ const ProductDetails = () => {
                 </div>
                 <div>
                   <label className="block text-xs uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2 transition-colors duration-500">Comment</label>
-                  <textarea 
+                  <textarea
                     rows="4"
                     value={comment}
                     onChange={(e) => setComment(e.target.value)}
@@ -247,9 +245,9 @@ const ProductDetails = () => {
                     placeholder="Share your experience..."
                   ></textarea>
                 </div>
-                <button 
+                <button
                   disabled={reviewLoading}
-                  type="submit" 
+                  type="submit"
                   className="w-full bg-black dark:bg-white text-white dark:text-black py-4 text-xs uppercase tracking-widest hover:bg-black/80 dark:hover:bg-gray-200 transition-colors"
                 >
                   {reviewLoading ? "Submitting..." : "Submit Review"}
@@ -267,20 +265,20 @@ const ProductDetails = () => {
 
       {/* --- IMAGE POP-UP MODAL --- */}
       {isModalOpen && (
-        <div 
+        <div
           className="fixed inset-0 z-[999] bg-black/95 flex items-center justify-center p-4 md:p-10 transition-all duration-500"
           onClick={() => setIsModalOpen(false)}
         >
-          <button 
+          <button
             className="absolute top-8 right-8 text-white/50 hover:text-white transition-colors z-[1000]"
             onClick={() => setIsModalOpen(false)}
           >
             <FaTimes size={30} />
           </button>
-          
-          <img 
-            src={product.image} 
-            alt="Fullscreen Preview" 
+
+          <img
+            src={product.image}
+            alt="Fullscreen Preview"
             className="max-w-full max-h-full object-contain animate-in fade-in zoom-in duration-300"
             onClick={(e) => e.stopPropagation()} // Click image par band nahi hoga
           />
