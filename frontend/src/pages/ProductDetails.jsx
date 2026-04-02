@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../features/cart/cartSlice";
 import { useState, useEffect } from "react";
 import { fetchProductById, createProductReview } from "../service/api";
-import { FaTimes, FaStar } from "react-icons/fa"; // Cross and Star icons
+import { FaTimes, FaStar, FaThumbsUp, FaThumbsDown } from "react-icons/fa"; // Cross and Star icons
 import toast from "react-hot-toast";
 
 const ProductDetails = () => {
@@ -17,6 +17,9 @@ const ProductDetails = () => {
   const [selectedSize, setSelectedSize] = useState("M");
   const [isAdded, setIsAdded] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false); // Modal state
+  const [isSizeChartOpen, setIsSizeChartOpen] = useState(false);
+  const [sizeChartTab, setSizeChartTab] = useState("size");
+  const [unit, setUnit] = useState("in");
 
   // Review States
   const { user } = useSelector((state) => state.auth);
@@ -143,6 +146,12 @@ const ProductDetails = () => {
           <div className="mb-12">
             <div className="flex justify-between items-center mb-4">
               <span className="text-xs uppercase tracking-[0.2em] text-gray-500 dark:text-gray-400 transition-colors duration-500">Select Size</span>
+              <button 
+                onClick={() => setIsSizeChartOpen(true)}
+                className="text-xs uppercase tracking-widest text-black/50 dark:text-white/50 hover:text-black dark:hover:text-white transition-colors duration-300 underline underline-offset-4"
+              >
+                Size Guide
+              </button>
             </div>
             <div className="grid grid-cols-4 gap-2">
               {["S", "M", "L", "XL"].map((size) => (
@@ -284,6 +293,169 @@ const ProductDetails = () => {
           />
         </div>
       )}
+
+      {/* --- SIZE CHART DRAWER --- */}
+      <>
+        {/* Overlay */}
+        <div 
+          className={`fixed inset-0 bg-black/40 z-[1000] backdrop-blur-sm transition-opacity duration-500 ${isSizeChartOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+          onClick={() => setIsSizeChartOpen(false)}
+        />
+        
+        {/* Drawer */}
+        <div 
+          className={`fixed top-0 right-0 h-full w-full sm:w-[450px] bg-white dark:bg-[#0a0a0a] z-[1001] shadow-2xl transform transition-transform duration-500 ease-[cubic-bezier(0.25,0.8,0.25,1)] flex flex-col ${isSizeChartOpen ? 'translate-x-0' : 'translate-x-[100%]'}`}
+        >
+          {/* Header */}
+          <div className="flex items-center justify-between p-6 border-b border-black/5 dark:border-white/5">
+            <h3 className="text-sm uppercase tracking-widest font-medium">Brand : {product.category || "Zero Degree"}</h3>
+            <button onClick={() => setIsSizeChartOpen(false)} className="text-gray-500 hover:text-black dark:hover:text-white transition-colors">
+              <FaTimes size={20} />
+            </button>
+          </div>
+
+          {/* Tabs */}
+          <div className="flex px-6 border-b border-black/5 dark:border-white/5">
+            <button 
+              onClick={() => setSizeChartTab('size')} 
+              className={`py-4 text-xs uppercase tracking-widest font-medium mr-6 border-b-2 transition-all ${sizeChartTab === 'size' ? 'border-black dark:border-white text-black dark:text-white' : 'border-transparent text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'}`}
+            >
+              Size Guide
+            </button>
+            <button 
+              onClick={() => setSizeChartTab('measure')} 
+              className={`py-4 text-xs uppercase tracking-widest font-medium border-b-2 transition-all ${sizeChartTab === 'measure' ? 'border-black dark:border-white text-black dark:text-white' : 'border-transparent text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'}`}
+            >
+              How to Measure
+            </button>
+          </div>
+
+          {/* Content */}
+          <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
+            {sizeChartTab === 'size' ? (
+              <div className="animate-in fade-in duration-300">
+                <div className="flex justify-between items-center mb-6">
+                  <span className="text-sm text-gray-600 dark:text-gray-400">Body Measurement <span className="text-xs">({unit === 'in' ? 'inches' : 'cm'})</span></span>
+                  <div className="flex bg-gray-100 dark:bg-gray-900 rounded-full p-1 border border-black/5 dark:border-white/5">
+                    <button 
+                      onClick={() => setUnit('in')}
+                      className={`px-3 py-1 text-xs rounded-full transition-colors ${unit === 'in' ? 'bg-black text-white dark:bg-white dark:text-black shadow-sm' : 'text-gray-500'}`}
+                    >
+                      in
+                    </button>
+                    <button 
+                      onClick={() => setUnit('cm')}
+                      className={`px-3 py-1 text-xs rounded-full transition-colors ${unit === 'cm' ? 'bg-black text-white dark:bg-white dark:text-black shadow-sm' : 'text-gray-500'}`}
+                    >
+                      cm
+                    </button>
+                  </div>
+                </div>
+
+                {/* Table */}
+                <div className="border border-black/10 dark:border-white/10 rounded-sm overflow-hidden mb-8">
+                  <table className="w-full text-center text-xs">
+                    <thead className="bg-gray-50 dark:bg-[#111] border-b border-black/10 dark:border-white/10">
+                      <tr>
+                        <th className="py-3 px-2 font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">Size</th>
+                        <th className="py-3 px-2 font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">Brand Size</th>
+                        <th className="py-3 px-2 font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">Shoulder</th>
+                        <th className="py-3 px-2 font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">Chest</th>
+                        <th className="py-3 px-2 font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">Length</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-black/5 dark:divide-white/5">
+                      {[
+                        { size: 'S', shoulder: 17.5, chest: 38, length: 27.7 },
+                        { size: 'M', shoulder: 18, chest: 40, length: 28.5 },
+                        { size: 'L', shoulder: 18.7, chest: 43, length: 29.5 },
+                        { size: 'XL', shoulder: 19.7, chest: 47, length: 30.5 },
+                      ].map((row) => (
+                        <tr 
+                          key={row.size} 
+                          className="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors group cursor-pointer"
+                          onClick={() => setSelectedSize(row.size)}
+                        >
+                          <td className="py-4 px-2 tracking-widest text-black dark:text-white flex justify-center items-center gap-2">
+                             <div className={`w-3 h-3 rounded-full border border-black/20 dark:border-white/20 group-hover:border-black dark:group-hover:border-white transition-colors ${selectedSize === row.size ? 'bg-black dark:bg-white border-black dark:border-white' : ''}`}></div>
+                             {row.size}
+                          </td>
+                          <td className="py-4 px-2 text-gray-600 dark:text-gray-400">{row.size}</td>
+                          <td className="py-4 px-2 text-gray-600 dark:text-gray-400">{unit === 'in' ? row.shoulder : Math.round(row.shoulder * 2.54)}</td>
+                          <td className="py-4 px-2 text-gray-600 dark:text-gray-400">{unit === 'in' ? row.chest : Math.round(row.chest * 2.54)}</td>
+                          <td className="py-4 px-2 text-gray-600 dark:text-gray-400">{unit === 'in' ? row.length : Math.round(row.length * 2.54)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Feedback */}
+                <div className="flex items-center gap-4 bg-gray-50 dark:bg-[#111] p-4 rounded-sm mb-8 border border-black/5 dark:border-white/5">
+                  <span className="text-xs text-gray-500">Was this information useful?</span>
+                  <div className="flex gap-2">
+                    <button className="text-gray-400 hover:text-black dark:hover:text-white transition-colors">
+                      <FaThumbsUp />
+                    </button>
+                    <button className="text-gray-400 hover:text-black dark:hover:text-white transition-colors">
+                      <FaThumbsDown />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Model Measurements */}
+                <div>
+                  <h4 className="text-sm font-medium mb-4">Model Measurements</h4>
+                  <div className="flex gap-6 items-center flex-wrap">
+                    <img 
+                      src={product.image} 
+                      alt="Model" 
+                      className="w-24 h-32 object-cover rounded-sm block bg-gray-100 dark:bg-[#111]"
+                    />
+                    <div className="text-sm text-gray-600 dark:text-gray-400 space-y-2 flex-1">
+                      <p>Size: <span className="text-black dark:text-white font-medium ml-1">M</span></p>
+                      <p>Height: <span className="text-black dark:text-white font-medium ml-1">5'11"</span></p>
+                      <p>Chest: <span className="text-black dark:text-white font-medium ml-1">38"</span></p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="animate-in fade-in duration-300">
+                {/* How to Measure Content */}
+                <h4 className="text-sm font-medium mb-4">How to Measure</h4>
+                <div className="space-y-6">
+                  <div>
+                     <p className="text-xs font-semibold mb-1 uppercase tracking-wider text-black dark:text-white">Shoulder</p>
+                     <p className="text-xs text-gray-500">Measure from one shoulder point to the other across the back.</p>
+                  </div>
+                  <div>
+                     <p className="text-xs font-semibold mb-1 uppercase tracking-wider text-black dark:text-white">Chest</p>
+                     <p className="text-xs text-gray-500">Measure around the fullest part of your chest, keeping the tape horizontal.</p>
+                  </div>
+                  <div>
+                     <p className="text-xs font-semibold mb-1 uppercase tracking-wider text-black dark:text-white">Length</p>
+                     <p className="text-xs text-gray-500">Measure from the top of the shoulder down to the desired hemline.</p>
+                  </div>
+               </div>
+               <div className="mt-8 p-4 bg-gray-50 dark:bg-[#111] rounded-sm text-xs text-gray-500 italic">
+                 For best results, have someone else measure you and try to measure over bare skin or form-fitting clothes.
+               </div>
+              </div>
+            )}
+          </div>
+          
+          {/* Action Button */}
+          <div className="p-6 border-t border-black/5 dark:border-white/5 bg-gray-50 dark:bg-[#0a0a0a]">
+            <button
+               onClick={() => setIsSizeChartOpen(false)}
+               className="w-full bg-black dark:bg-white text-white dark:text-black py-4 text-xs uppercase tracking-widest hover:bg-black/80 dark:hover:bg-gray-200 transition-colors"
+            >
+              Continue Shopping
+            </button>
+          </div>
+        </div>
+      </>
     </div>
   );
 };
