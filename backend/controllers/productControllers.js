@@ -56,13 +56,13 @@ export const getProductById = asyncHandler(async (req, res) => {
 // @desc    Create a product (Admin)
 // @route   POST /products
 export const createProduct = asyncHandler(async (req, res) => {
-  const { title, price, description, image, stock, category } = req.body;
+  const { title, price, description, image, images, colors, stock, category } = req.body;
   if (!title || !price) {
     res.status(400);
     throw new Error("Title and Price are required");
   }
 
-  const product = new Product({ title, price, description, image, stock, category });
+  const product = new Product({ title, price, description, image, images, colors, stock, category });
   const createdProduct = await product.save();
   res.status(201).json(createdProduct);
 });
@@ -76,7 +76,9 @@ export const updateProduct = asyncHandler(async (req, res) => {
     product.price = req.body.price || product.price;
     product.description = req.body.description || product.description;
     product.image = req.body.image || product.image;
-    product.stock = req.body.stock || product.stock;
+    if (req.body.images !== undefined) product.images = req.body.images;
+    if (req.body.colors !== undefined) product.colors = req.body.colors;
+    product.stock = req.body.stock !== undefined ? req.body.stock : product.stock;
     product.category = req.body.category || product.category;
 
     const updatedProduct = await product.save();

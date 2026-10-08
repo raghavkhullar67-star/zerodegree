@@ -2,6 +2,8 @@ import { useSelector, useDispatch } from "react-redux";
 import { Navigate, Link } from "react-router-dom";
 import { useEffect } from "react";
 import { getMyOrdersThunk, cancelOrderThunk } from "../features/order/orderslice";
+import { getImageUrl } from "../utils/imageUtils";
+
 const Orders = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user);
@@ -114,7 +116,7 @@ const Orders = () => {
                     <div key={item._id || Math.random()} className="flex items-center gap-6 group/item">
                       <div className="relative w-20 h-24 md:w-24 md:h-32 overflow-hidden bg-gray-100 dark:bg-[#111] transition-colors duration-500">
                         <img
-                          src={item.image}
+                          src={getImageUrl(item.image)}
                           alt={item.title}
                           className="w-full h-full object-cover grayscale-[40%] group-hover/item:grayscale-0 group-hover/item:scale-110 transition-all duration-1000"
                         />

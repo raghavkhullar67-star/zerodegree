@@ -6,6 +6,7 @@ import {
   removeFromCart,
 } from "../features/cart/cartSlice";
 import { useNavigate, Link } from "react-router-dom";
+import { getImageUrl } from "../utils/imageUtils";
 
 const Cart = () => {
   const dispatch = useDispatch();
@@ -82,6 +83,7 @@ const Cart = () => {
           <div className="flex-1 w-full flex flex-col gap-6">
             {cartItems.map((item, index) => {
               const itemId = item.id || item._id;
+              const productBaseRouteId = item.baseId || item._id || itemId;
               const itemTitle = item.title || item.name;
               const itemImage = item.image || (item.images && item.images[0]);
 
@@ -91,9 +93,9 @@ const Cart = () => {
                   className="group flex flex-col sm:flex-row gap-8 py-8 border-b border-black/10 dark:border-white/10 relative transition-all duration-500"
                 >
                   {/* Left: Product Image */}
-                  <Link to={`/products/${itemId}`} className="relative w-full sm:w-40 aspect-[3/4] bg-black/5 dark:bg-white/5 overflow-hidden block">
+                  <Link to={`/products/${productBaseRouteId}`} className="relative w-full sm:w-40 aspect-[3/4] bg-black/5 dark:bg-white/5 overflow-hidden block">
                     <img
-                      src={itemImage}
+                      src={getImageUrl(itemImage)}
                       alt={itemTitle}
                       className="w-full h-full object-cover grayscale-[30%] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700 ease-out"
                     />
@@ -103,7 +105,7 @@ const Cart = () => {
                   <div className="flex-1 flex flex-col justify-between pt-2">
                     <div className="flex justify-between items-start gap-4">
                       <div className="space-y-3">
-                        <Link to={`/products/${itemId}`} className="block">
+                        <Link to={`/products/${productBaseRouteId}`} className="block">
                           <h2 className="text-sm md:text-base uppercase tracking-widest font-light text-black dark:text-white leading-snug hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
                             {itemTitle}
                           </h2>

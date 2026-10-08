@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { FaUpload, FaTimes, FaTrash, FaPlus, FaEdit } from "react-icons/fa";
-import { fetchProducts, createProduct, deleteProduct, updateProduct } from "../service/api";
+import { fetchProducts, createProduct, deleteProduct, updateProduct, uploadFile } from "../service/api";
+import { getImageUrl } from "../utils/imageUtils";
 
 const AddProduct = () => {
   // --- STATES ---
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [preview, setPreview] = useState(null);
+  const [uploadingImage, setUploadingImage] = useState(0);
   const [editingId, setEditingId] = useState(null); // New state for editing
   const [formData, setFormData] = useState({
     title: "",
@@ -14,7 +15,9 @@ const AddProduct = () => {
     price: "",
     stock: "",
     description: "",
-    image: "" // Yahan image ka URL ya file handle hogi
+    image: "", // Yahan image ka URL ya file handle hogi
+    images: "", // Comma-separated alternative images
+    colors: "" // Comma-separated colors
   });
 
   // --- FETCH PRODUCTS ---
@@ -38,34 +41,98 @@ const AddProduct = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0]; 
-    if (file) {
-      setPreview(URL.createObjectURL(file));
-      // File upload bypass
-      setFormData({ ...formData, image: "https://via.placeholder.com/400" }); 
+  const handlePasteInInput = async (e, mode) => {
+    const cpData = e.clipboardData || e.nativeEvent?.clipboardData;
+    if (!cpData) return;
+    const items = cpData.items;
+
+    let hasFiles = false;
+    for (let i = 0; i < items.length; i++) {
+        if (items[i].kind === 'file' && items[i].type.startsWith('image/')) hasFiles = true;
+    }
+    
+    if (hasFiles) {
+        e.preventDefault(); // Stop standard text paste entirely only if files exist
+        for (let i = 0; i < items.length; i++) {
+          const item = items[i];
+          if (item.kind === 'file' && item.type.startsWith('image/')) {
+            const blob = item.getAsFile();
+            try {
+              setUploadingImage(prev => prev + 1);
+              const fd = new FormData();
+              fd.append("image", blob);
+              const uploadedUrl = await uploadFile(fd);
+              
+              if (mode === 'primary') {
+                  setFormData(prev => ({ ...prev, image: uploadedUrl }));
+              } else {
+                  setFormData(prev => {
+                      let newImagesArr = typeof prev.images === "string" ? (prev.images ? prev.images.split(",").map(i=>i.trim()) : []) : (prev.images || []);
+                      newImagesArr.push(uploadedUrl);
+                      return { ...prev, images: newImagesArr.join(", ") };
+                  });
+              }
+            } catch (err) {
+              alert("Image upload failed");
+            } finally {
+              setUploadingImage(prev => Math.max(0, prev - 1));
+            }
+          }
+        }
     }
   };
 
-  const handleRemoveImage = () => {
-    setPreview(null);
-    document.getElementById("imageUpload").value = "";
+  const handleFileUpload = async (e, mode) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    try {
+      setUploadingImage(prev => prev + 1);
+      const fd = new FormData();
+      fd.append("image", file);
+      const uploadedUrl = await uploadFile(fd);
+      
+      if (mode === 'primary') {
+          setFormData(prev => ({ ...prev, image: uploadedUrl }));
+      } else {
+          setFormData(prev => {
+              let newImagesArr = typeof prev.images === "string" ? (prev.images ? prev.images.split(",").map(i=>i.trim()) : []) : (prev.images || []);
+              newImagesArr.push(uploadedUrl);
+              return { ...prev, images: newImagesArr.join(", ") };
+          });
+      }
+    } catch (err) {
+      alert("Image upload failed");
+    } finally {
+      setUploadingImage(prev => Math.max(0, prev - 1));
+      e.target.value = null; // reset input
+    }
   };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       setLoading(true);
+      
+      const payload = { ...formData };
+      
+      // Convert comma-separated string to arrays
+      if (typeof payload.images === "string") {
+        payload.images = payload.images.split(",").map(i => i.trim()).filter(i => i);
+      }
+      if (typeof payload.colors === "string") {
+        payload.colors = payload.colors.split(",").map(c => c.trim()).filter(c => c);
+      }
+
       if (editingId) {
-         await updateProduct(editingId, formData);
+         await updateProduct(editingId, payload);
          alert("Piece Updated Successfully 🚀");
          setEditingId(null);
       } else {
-         await createProduct(formData);
+         await createProduct(payload);
          alert("Piece Added to Collection 🚀");
       }
-      setFormData({ title: "", category: "", price: "", stock: "", description: "", image: "" });
-      setPreview(null);
+      setFormData({ title: "", category: "", price: "", stock: "", description: "", image: "", images: "", colors: "" });
       loadProducts(); // List refresh karein
     } catch (error) {
       alert("Error processing product request");
@@ -82,16 +149,17 @@ const AddProduct = () => {
       price: product.price,
       stock: product.stock,
       description: product.description,
-      image: product.image
+      image: product.image,
+      images: Array.isArray(product.images) ? product.images.join(", ") : "",
+      colors: Array.isArray(product.colors) ? product.colors.join(", ") : ""
     });
-    setPreview(product.image); // Load preview visually if URL exists
+
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const cancelEdit = () => {
     setEditingId(null);
-    setFormData({ title: "", category: "", price: "", stock: "", description: "", image: "" });
-    setPreview(null);
+    setFormData({ title: "", category: "", price: "", stock: "", description: "", image: "", images: "", colors: "" });
   };
 
   const handleDelete = async (id) => {
@@ -149,14 +217,58 @@ const AddProduct = () => {
             </div>
 
             <div className="grid grid-cols-2 gap-6">
-                <div>
-                    <label className="block mb-2 text-xs uppercase tracking-widest text-slate-400">Inventory Stock</label>
-                    <input name="stock" value={formData.stock} onChange={handleInputChange} type="number" placeholder="Qty" className="w-full bg-slate-950/50 border border-slate-800 py-3 px-4 text-sm text-white focus:border-indigo-400 focus:outline-none" required />
-                </div>
-                <div>
-                   <label className="block mb-2 text-xs uppercase tracking-widest text-slate-400">Image URL (Optional)</label>
-                   <input name="image" value={formData.image} onChange={handleInputChange} type="text" placeholder="URL" className="w-full bg-slate-950/50 border border-slate-800 py-3 px-4 text-sm text-white focus:border-indigo-400 focus:outline-none" />
-                </div>
+              <div>
+                <label className="block mb-2 text-xs uppercase tracking-widest text-slate-400">Inventory Stock</label>
+                <input name="stock" value={formData.stock} onChange={handleInputChange} type="number" placeholder="Qty" className="w-full bg-slate-950/50 border border-slate-800 py-3 px-4 text-sm text-white focus:border-indigo-400 focus:outline-none" required />
+              </div>
+              <div>
+                 <div className="flex justify-between items-center mb-2">
+                   <label className="text-xs uppercase tracking-widest text-slate-400">Primary Image {uploadingImage > 0 && '(Uploading...)'}</label>
+                   <label className="cursor-pointer text-[10px] uppercase text-indigo-400 hover:text-indigo-300">
+                      Upload File
+                      <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileUpload(e, 'primary')} />
+                   </label>
+                 </div>
+                 <input name="image" value={formData.image} onChange={handleInputChange} onPaste={(e) => handlePasteInInput(e, 'primary')} type="text" placeholder="URL or Paste Image Here" className="w-full bg-slate-950/50 border border-slate-800 py-3 px-4 text-sm text-white focus:border-indigo-400 focus:outline-none" />
+              </div>
+            </div>
+
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <label className="text-xs uppercase tracking-widest text-slate-400">Additional Images {uploadingImage > 0 && '(Uploading...)'}</label>
+                <label className="cursor-pointer text-[10px] uppercase text-indigo-400 hover:text-indigo-300">
+                    Upload File
+                    <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileUpload(e, 'additional')} />
+                </label>
+              </div>
+              <input name="images" value={typeof formData.images === "string" ? formData.images : (formData.images || []).join(", ")} onChange={handleInputChange} onPaste={(e) => handlePasteInInput(e, 'additional')} type="text" placeholder="Separate URLs by comma, or Paste image here" className="w-full bg-slate-950/50 border border-slate-800 py-3 px-4 text-sm text-white focus:border-indigo-400 focus:outline-none mb-3" />
+              
+              {/* Visual Grid for Additional Images */}
+              {(() => {
+                 let arr = typeof formData.images === "string" ? (formData.images ? formData.images.split(",").map(i=>i.trim()).filter(Boolean) : []) : (formData.images || []);
+                 if (arr.length === 0) return null;
+                 return (
+                   <div className="flex flex-wrap gap-4 mb-3">
+                     {arr.map((imgUrl, idx) => (
+                       <div key={idx} className="relative group p-2 bg-slate-950/50 border border-slate-800">
+                         <img src={getImageUrl(imgUrl)} className="w-16 h-20 object-cover border border-slate-700" alt="additional" />
+                         <button type="button" onClick={() => {
+                            let newArr = [...arr];
+                            newArr.splice(idx, 1);
+                            setFormData(prev => ({...prev, images: newArr.join(", ")}));
+                         }} className="absolute -top-2 -right-2 bg-rose-500 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg hover:bg-rose-400">
+                            <FaTimes size={10} />
+                         </button>
+                       </div>
+                     ))}
+                   </div>
+                 )
+              })()}
+            </div>
+
+            <div>
+              <label className="block mb-2 text-xs uppercase tracking-widest text-slate-400">Colors (Comma Separated Hex/Names)</label>
+              <input name="colors" value={formData.colors} onChange={handleInputChange} type="text" placeholder="Black, #ffffff, Blue" className="w-full bg-slate-950/50 border border-slate-800 py-3 px-4 text-sm text-white focus:border-indigo-400 focus:outline-none" />
             </div>
 
             <div>
@@ -164,23 +276,14 @@ const AddProduct = () => {
               <textarea name="description" value={formData.description} onChange={handleInputChange} rows="3" className="w-full bg-slate-950/50 border border-slate-800 py-3 px-4 text-sm text-white focus:border-indigo-400 focus:outline-none resize-none" required></textarea>
             </div>
 
-            {/* Image Upload */}
-            <div>
-              {!preview ? (
-                <label htmlFor="imageUpload" className="border border-dashed border-slate-800 bg-slate-950/30 p-8 text-center cursor-pointer flex flex-col items-center hover:border-indigo-500 transition-all">
-                  <FaUpload className="text-slate-400 mb-2" />
-                  <span className="text-xs uppercase tracking-widest text-slate-400">Upload Visual</span>
-                  <input type="file" id="imageUpload" onChange={handleImageChange} className="hidden" accept="image/*" />
-                </label>
-              ) : (
-                <div className="flex items-center gap-4 bg-slate-950/50 p-3 border border-slate-800">
-                  <img src={preview} className="w-16 h-20 object-cover border border-slate-700" alt="preview" />
-                  <button type="button" onClick={handleRemoveImage} className="text-rose-500 text-xs uppercase tracking-widest hover:text-rose-400">Remove</button>
-                </div>
-              )}
-            </div>
+            {formData.image && (
+              <div className="flex items-center gap-4 bg-slate-950/50 p-3 border border-slate-800">
+                <img src={getImageUrl(formData.image)} className="w-16 h-20 object-cover border border-slate-700" alt="preview" />
+                <button type="button" onClick={() => setFormData(prev => ({...prev, image: ""}))} className="text-rose-500 text-xs uppercase tracking-widest hover:text-rose-400">Remove</button>
+              </div>
+            )}
 
-            <button type="submit" disabled={loading} className="w-full bg-white text-black py-4 text-xs font-bold uppercase tracking-[0.3em] hover:bg-indigo-400 transition-all">
+            <button type="submit" disabled={loading || uploadingImage > 0} className="w-full bg-white text-black py-4 text-xs font-bold uppercase tracking-[0.3em] hover:bg-indigo-400 transition-all">
               {loading ? "Processing..." : (editingId ? "Update Piece" : "Publish Piece")}
             </button>
           </form>
@@ -196,7 +299,7 @@ const AddProduct = () => {
           <div className="space-y-4 max-h-[700px] overflow-y-auto pr-2 custom-scrollbar">
             {products.map((item) => (
               <div key={item._id} className="group flex items-center gap-4 bg-slate-950/40 border border-slate-800/60 p-3 hover:border-slate-600 transition-all">
-                <img src={item.image} alt="" className="w-12 h-16 object-cover bg-slate-900" />
+                <img src={getImageUrl(item.image)} alt="" className="w-12 h-16 object-cover bg-slate-900" />
                 <div className="flex-1">
                   <h3 className="text-xs uppercase tracking-widest text-white truncate w-40">{item.title}</h3>
                   <p className="text-xs text-slate-400 mt-1">₹{item.price} — {item.category}</p>

@@ -17,6 +17,8 @@ const productSchema = new mongoose.Schema(
       type: String, // Yahan image ka URL store hoga
       required: [true, "Please add an image URL"],
     },
+    images: [String], // Array for additional image URLs
+    colors: [String], // Array for available colors
     description: {
       type: String,
       required: [true, "Please add a description"],

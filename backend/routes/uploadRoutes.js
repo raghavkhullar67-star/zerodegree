@@ -1,9 +1,11 @@
 import path from "path";
 import express from "express";
 import multer from "multer";
+import fs from "fs";
 import { v2 as cloudinary } from "cloudinary";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import dotenv from "dotenv";
+import { protect, admin } from "../middleware/authMiddleware.js";
 
 dotenv.config();
 
@@ -27,9 +29,15 @@ if (process.env.CLOUDINARY_CLOUD_NAME) {
     },
   });
 } else {
+  const uploadDir = "uploads/";
+  // Create uploads directory immediately if it doesn't exist
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+  }
+
   storage = multer.diskStorage({
     destination(req, file, cb) {
-      cb(null, "uploads/");
+      cb(null, uploadDir);
     },
     filename(req, file, cb) {
       cb(
@@ -59,7 +67,7 @@ const upload = multer({
   },
 });
 
-router.post("/", upload.single("image"), (req, res) => {
+router.post("/", protect, admin, upload.single("image"), (req, res) => {
   if (req.file && req.file.path) {
     // If CLOUDINARY is defined, we get a direct URL. If not, we format it.
     const imagePath = process.env.CLOUDINARY_CLOUD_NAME 

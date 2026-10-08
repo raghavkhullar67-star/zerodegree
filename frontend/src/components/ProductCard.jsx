@@ -5,6 +5,7 @@ import { toggleWishlistItem } from "../features/auth/authSlice";
 // Import a sleek icon for the button
 import { FaShoppingBag, FaHeart, FaRegHeart } from "react-icons/fa";
 import toast from "react-hot-toast";
+import { getImageUrl } from "../utils/imageUtils";
 
 const ProductCard = ({ product }) => {
   const dispatch = useDispatch();
@@ -59,7 +60,7 @@ const ProductCard = ({ product }) => {
         <Link to={`/products/${product._id}`}>
           {/* Image scales and slightly dims on hover for drama */}
           <img
-            src={product.image}
+            src={getImageUrl(product.image)}
             alt={product.title}
             loading="lazy"
             className="w-full h-full object-cover object-center transition-all duration-[1.5s] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-110"

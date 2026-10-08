@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { fetchProductById, createProductReview } from "../service/api";
 import { FaTimes, FaStar, FaThumbsUp, FaThumbsDown } from "react-icons/fa"; // Cross and Star icons
 import toast from "react-hot-toast";
+import { getImageUrl } from "../utils/imageUtils";
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -15,6 +16,8 @@ const ProductDetails = () => {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedSize, setSelectedSize] = useState("M");
+  const [selectedColor, setSelectedColor] = useState("");
+  const [activeImage, setActiveImage] = useState("");
   const [isAdded, setIsAdded] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false); // Modal state
   const [isSizeChartOpen, setIsSizeChartOpen] = useState(false);
@@ -34,6 +37,8 @@ const ProductDetails = () => {
         setLoading(true);
         const data = await fetchProductById(id);
         setProduct(data);
+        setActiveImage(data.image);
+        if (data.colors && data.colors.length > 0) setSelectedColor(data.colors[0]);
       } catch (error) {
         console.error("Error fetching product:", error);
       } finally {
@@ -54,6 +59,7 @@ const ProductDetails = () => {
         image: product.image,
         category: product.category,
         selectedSize,
+        selectedColor,
         quantity: 1
       }));
       toast.success("Added to Bag");
@@ -99,16 +105,40 @@ const ProductDetails = () => {
 
       <div className="container mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-start">
 
-        {/* Left: Product Image (Fixed Height & Clickable) */}
-        <div
-          className="w-full bg-white dark:bg-[#0a0a0a] transition-colors duration-500 lg:h-[80vh] aspect-[3/4] flex items-center justify-center overflow-hidden border border-black/5 dark:border-white/5 cursor-zoom-in"
-          onClick={() => setIsModalOpen(true)}
-        >
-          <img
-            src={product.image}
-            alt={product.title}
-            className="max-w-full max-h-full object-contain hover:scale-105 transition-transform duration-1000"
-          />
+        {/* Left: Product Image (Gallery) */}
+        <div className="w-full flex gap-4 h-auto lg:h-[80vh] flex-col-reverse lg:flex-row">
+            {/* Thumbnails */}
+            {(product.images && product.images.length > 0) && (
+              <div className="flex lg:flex-col gap-4 overflow-x-auto lg:overflow-y-auto w-full lg:w-20 shrink-0 custom-scrollbar pb-2 lg:pb-0">
+                <img 
+                   src={getImageUrl(product.image)} 
+                   onClick={() => setActiveImage(product.image)}
+                   className={`w-16 h-20 lg:w-full lg:h-24 object-cover cursor-pointer border transition-colors ${activeImage === product.image ? 'border-black dark:border-white' : 'border-transparent opacity-60 hover:opacity-100'}`} 
+                   alt="thumbnail"
+                />
+                {product.images.map((img, idx) => (
+                  <img 
+                     key={idx} 
+                     src={getImageUrl(img)} 
+                     onClick={() => setActiveImage(img)}
+                     className={`w-16 h-20 lg:w-full lg:h-24 object-cover cursor-pointer border transition-colors ${activeImage === img ? 'border-black dark:border-white' : 'border-transparent opacity-60 hover:opacity-100'}`} 
+                     alt={`thumbnail-${idx}`}
+                  />
+                ))}
+              </div>
+            )}
+            
+            {/* Main Image */}
+            <div
+              className="flex-1 bg-white dark:bg-[#0a0a0a] transition-colors duration-500 w-full h-full aspect-[3/4] flex items-center justify-center overflow-hidden border border-black/5 dark:border-white/5 cursor-zoom-in"
+              onClick={() => setIsModalOpen(true)}
+            >
+              <img
+                src={getImageUrl(activeImage || product.image)}
+                alt={product.title}
+                className="max-w-full max-h-full object-contain hover:scale-105 transition-transform duration-1000"
+              />
+            </div>
         </div>
 
         {/* Right: Product Content */}
@@ -141,6 +171,31 @@ const ProductDetails = () => {
               {product.description}
             </p>
           </div>
+
+          {/* Color Selection */}
+          {product.colors && product.colors.length > 0 && (
+            <div className="mb-10">
+              <div className="flex justify-between items-center mb-4">
+                 <span className="text-xs uppercase tracking-[0.2em] text-gray-500 dark:text-gray-400 transition-colors duration-500">Color: <span className="text-black dark:text-white capitalize font-medium">{selectedColor}</span></span>
+              </div>
+              <div className="flex flex-wrap gap-4">
+                 {product.colors.map((color, idx) => {
+                    const isHex = color.startsWith('#');
+                    return (
+                        <button 
+                           key={idx}
+                           onClick={() => { setSelectedColor(color); setIsAdded(false); }}
+                           title={color}
+                           className={`transition-all duration-300 rounded-full flex items-center justify-center ${selectedColor === color ? 'ring-2 ring-offset-2 ring-black dark:ring-white dark:ring-offset-[#050505]' : 'ring-1 ring-black/10 dark:ring-white/10 hover:ring-black/40 dark:hover:ring-white/40'} ${!isHex ? 'px-4 py-2 text-xs tracking-widest' : 'w-8 h-8'}`}
+                           style={isHex ? { backgroundColor: color } : {}}
+                        >
+                           {!isHex && <span>{color}</span>}
+                        </button>
+                    )
+                 })}
+              </div>
+            </div>
+          )}
 
           {/* Size Selection */}
           <div className="mb-12">
@@ -286,7 +341,7 @@ const ProductDetails = () => {
           </button>
 
           <img
-            src={product.image}
+            src={getImageUrl(activeImage || product.image)}
             alt="Fullscreen Preview"
             className="max-w-full max-h-full object-contain animate-in fade-in zoom-in duration-300"
             onClick={(e) => e.stopPropagation()} // Click image par band nahi hoga
@@ -408,7 +463,7 @@ const ProductDetails = () => {
                   <h4 className="text-sm font-medium mb-4">Model Measurements</h4>
                   <div className="flex gap-6 items-center flex-wrap">
                     <img 
-                      src={product.image} 
+                      src={getImageUrl(product.image)} 
                       alt="Model" 
                       className="w-24 h-32 object-cover rounded-sm block bg-gray-100 dark:bg-[#111]"
                     />

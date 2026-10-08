@@ -229,11 +229,7 @@ export const createProductReview = async (productId, reviewData) => {
 // ==========================
 export const uploadFile = async (fileData) => {
   try {
-    const response = await API.post('/api/upload', fileData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+    const response = await API.post('/api/upload', fileData);
     return response.data; // Server returns the image path as a string
   } catch (error) {
     console.error("Error uploading file:", error);

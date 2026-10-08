@@ -32,7 +32,9 @@ const cartSlice = createSlice({
   reducers: {
     addToCart: (state, action) => {
       // 1. Normalize ID: MongoDB ka _id ho ya regular id, hum 'id' hi use karenge
-      const pId = action.payload._id || action.payload.id;
+      const rawId = action.payload._id || action.payload.id;
+      // 2. Create composite ID to distinguish between sizes and colors
+      const pId = `${rawId}-${action.payload.selectedSize || 'na'}-${action.payload.selectedColor || 'na'}`;
 
       const existingItem = state.items.find((item) => item.id === pId);
       const quantityToAdd = action.payload.quantity || 1;
@@ -40,10 +42,11 @@ const cartSlice = createSlice({
       if (existingItem) {
         existingItem.quantity += quantityToAdd;
       } else {
-        // 2. Pure payload ko store kar rahe hain, par ID ko 'id' key par set kar rahe hain
+        // 3. Pure payload ko store kar rahe hain, par ID ko 'id' key par set kar rahe hain
         state.items.push({
           ...action.payload,
           id: pId,
+          baseId: rawId,
           quantity: quantityToAdd
         });
       }
