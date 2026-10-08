@@ -2,8 +2,7 @@ import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../features/cart/cartSlice";
 import { toggleWishlistItem } from "../features/auth/authSlice";
-// Import a sleek icon for the button
-import { FaShoppingBag, FaHeart, FaRegHeart } from "react-icons/fa";
+import { FaShoppingBag, FaHeart, FaRegHeart, FaMicrochip } from "react-icons/fa";
 import toast from "react-hot-toast";
 import { getImageUrl } from "../utils/imageUtils";
 
@@ -16,13 +15,13 @@ const ProductCard = ({ product }) => {
   const handleAddToCart = (e) => {
     e.preventDefault();
     dispatch(addToCart({ ...product, quantity: 1 }));
-    toast.success("Added to Bag");
+    toast.success("Added to Cyber Bag 🛒");
   };
 
   const handleWishlist = (e) => {
     e.preventDefault();
     if (!user) {
-      toast.error("Please login to use Wishlist");
+      toast.error("Please login to use Cyber Wishlist");
       return;
     }
     dispatch(toggleWishlistItem({ productId: product._id, isAdded: isFavorite }));
@@ -31,81 +30,79 @@ const ProductCard = ({ product }) => {
   };
 
   return (
-    // ADVANCED CARD WRAPPER:
-    // Replaced heavy borders with subtle 'rings' for a premium glow effect.
-    // Added 'group' for hover states across elements.
-    <div className="group relative flex flex-col font-sans bg-white dark:bg-[#050505] ring-1 ring-black/5 dark:ring-white/5 hover:ring-black/20 dark:hover:ring-white/20 transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] h-full rounded-sm overflow-hidden">
+    <div className="group relative flex flex-col font-mono bg-[#07132b]/80 border border-cyan-500/30 hover:border-cyan-400 transition-all duration-500 ease-out h-full rounded-md overflow-hidden cyber-border-glow hover:shadow-[0_0_25px_rgba(6,182,212,0.4)]">
       
-      {/* 1. IMAGE CONTAINER - Cinematic & Interactive */}
-      <div className="relative overflow-hidden aspect-[3/4] bg-gray-100 dark:bg-[#030303]">
-        {/* Wishlist Heart Icon */}
+      {/* 1. IMAGE CONTAINER */}
+      <div className="relative overflow-hidden aspect-[3/4] bg-[#030712]">
+        
+        {/* Wishlist Heart Button */}
         <button 
           onClick={handleWishlist}
-          className="absolute top-4 right-4 z-30 p-2.5 rounded-full bg-white/40 dark:bg-black/40 backdrop-blur-md border border-black/5 dark:border-white/5 opacity-0 group-hover:opacity-100 transition-all duration-500 hover:bg-black dark:hover:bg-white hover:text-white dark:hover:text-black"
+          className="absolute top-3 right-3 z-30 p-2.5 rounded-full bg-cyan-950/80 border border-cyan-500/50 backdrop-blur-md opacity-90 group-hover:opacity-100 transition-all duration-300 hover:bg-cyan-400 hover:text-black text-cyan-300"
         >
           {isFavorite ? (
-            <FaHeart className="text-red-500 text-xs" />
+            <FaHeart className="text-pink-500 text-xs" />
           ) : (
-            <FaRegHeart className="text-white text-xs" />
+            <FaRegHeart className="text-xs" />
           )}
         </button>
 
-        {/* Category Badge - Subtle reveal */}
-        <div className="absolute top-4 left-4 z-30 opacity-0 group-hover:opacity-100 transition-all duration-700 translate-x-[-10px] group-hover:translate-x-0">
-          <span className="text-[8px] uppercase tracking-[0.3em] bg-black/10 dark:bg-white/10 backdrop-blur-sm border border-black/10 dark:border-white/10 px-3 py-1 text-black/70 dark:text-white/70">
-            {product.category || "General"}
+        {/* Category & Rating Badges */}
+        <div className="absolute top-3 left-3 z-30 flex flex-col gap-1.5">
+          <span className="text-[9px] font-mono uppercase tracking-widest bg-cyan-950/90 border border-cyan-500/50 px-2.5 py-1 text-cyan-300 backdrop-blur-md rounded-sm">
+            {product.category || "GENERAL"}
           </span>
         </div>
 
         <Link to={`/products/${product._id}`}>
-          {/* Image scales and slightly dims on hover for drama */}
           <img
             src={getImageUrl(product.image)}
             alt={product.title}
             loading="lazy"
-            className="w-full h-full object-cover object-center transition-all duration-[1.5s] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-110"
+            className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-110 filter brightness-90 group-hover:brightness-105"
           />
-          {/* Cinematic Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-40 group-hover:opacity-60 transition-opacity duration-700"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-[#030712] via-transparent to-transparent opacity-60 group-hover:opacity-80 transition-opacity"></div>
         </Link>
           
-        {/* Interactive Add to Bag (Desktop) */}
-        <div className="absolute inset-x-4 bottom-4 translate-y-[120%] group-hover:translate-y-0 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] hidden lg:block z-20">
+        {/* Interactive Add to Bag Button */}
+        <div className="absolute inset-x-3 bottom-3 translate-y-[120%] group-hover:translate-y-0 transition-all duration-500 hidden lg:block z-20">
           <button 
             onClick={handleAddToCart}
-            className="w-full flex items-center justify-center gap-3 bg-black dark:bg-white text-white dark:text-black text-[10px] font-bold uppercase tracking-[0.3em] py-4 hover:bg-white dark:hover:bg-black hover:text-black dark:hover:text-white hover:border-black/20 dark:hover:border-white/20 border border-transparent transition-all duration-500"
+            className="w-full flex items-center justify-center gap-2 bg-cyan-400 text-black text-[10px] font-mono font-bold uppercase tracking-[0.2em] py-3.5 hover:bg-cyan-300 transition-all shadow-[0_0_20px_rgba(6,182,212,0.8)] rounded-sm"
           >
             <FaShoppingBag className="text-xs" />
-            <span>Add to Bag</span>
+            <span>EQUIP / ADD TO BAG</span>
           </button>
         </div>
       </div>
 
-      {/* 2. CARD BODY (PRODUCT DETAILS) - Minimalist Typography */}
-      <div className="flex flex-col flex-1 text-left p-6 relative z-10 bg-white dark:bg-[#050505] transition-colors duration-500">
+      {/* 2. CARD DETAILS */}
+      <div className="flex flex-col flex-1 text-left p-5 relative z-10 bg-[#07132b]/90 text-white">
         
-        <div className="flex justify-between items-start gap-4 mb-2">
+        <div className="flex justify-between items-start gap-2 mb-2">
           <Link to={`/products/${product._id}`} className="flex-1">
-            <h2 className="text-xs font-light uppercase tracking-[0.2em] text-black/90 dark:text-white/90 group-hover:text-black dark:group-hover:text-white transition-colors duration-500 line-clamp-1">
+            <h2 className="text-xs font-mono font-bold uppercase tracking-wider text-cyan-200 group-hover:text-cyan-400 transition-colors line-clamp-1">
               {product.title}
             </h2>
           </Link>
-          <p className="text-xs text-black/60 dark:text-white/60 tracking-widest font-light transition-colors duration-500">
+          <p className="text-xs font-mono text-pink-400 font-bold tracking-widest">
             ₹{product.price}
           </p>
         </div>
-        
-        {/* Sub-label or extra detail */}
-        <div className="overflow-hidden h-0 group-hover:h-4 transition-all duration-500 ease-out">
-           <span className="text-[8px] uppercase tracking-[0.4em] text-black/40 dark:text-white/40">Limited Series 01</span>
+
+        <div className="flex items-center justify-between text-[9px] font-mono text-cyan-400/60 mt-1">
+          <span className="flex items-center gap-1">
+            <FaMicrochip className="text-xs text-cyan-400" /> 0.0°K WEAVE
+          </span>
+          <span>STOCK: {product.stock ?? 10}</span>
         </div>
 
-        {/* 3. MOBILE ADD BUTTON */}
+        {/* Mobile Add Button */}
         <button 
           onClick={handleAddToCart}
-          className="lg:hidden w-full border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 text-black/80 dark:text-white/80 text-[10px] font-bold uppercase tracking-[0.3em] py-4 mt-6 active:bg-black dark:active:bg-white active:text-white dark:active:text-black transition-all duration-300"
+          className="lg:hidden w-full bg-cyan-400 text-black text-[10px] font-mono font-bold uppercase tracking-widest py-3 mt-4 active:bg-cyan-300 rounded-sm shadow-[0_0_10px_rgba(6,182,212,0.5)]"
         >
-          Add to Bag
+          EQUIP / ADD TO BAG
         </button>
       </div>
       
